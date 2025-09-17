@@ -4,26 +4,9 @@ import pandas as pd
 from advanced_ta import LorentzianClassification
 from ta.momentum import RSIIndicator
 from ta.trend import EMAIndicator
-
-
-# def get_historical_data(symbol: str, period: str = "6mo", interval: str = "1d") -> pd.DataFrame | str:
-#     """
-#     Gets historical market data from Yahoo Finance.
-#     """
-#     try:
-#         ticker = yf.Ticker(symbol)
-#         df = ticker.history(period=period, interval=interval)
-        
-#         if df.empty:
-#             return f"Error: No data found for symbol '{symbol}'."
-            
-#         # The library requires column names to be lowercase
-#         df.columns = df.columns.str.lower()
-        
-#         return df[['open', 'high', 'low', 'close', 'volume']]
-        
-#     except Exception as e:
-#         return f"An error occurred fetching data from Yahoo Finance: {e}"
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import requests
 
 def get_historical_data(symbol: str = 'TON/USDT', timeframe: str = '1h', limit: int = 1000) -> pd.DataFrame | str:
     """
@@ -70,11 +53,6 @@ def add_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
     df['ema_200'] = EMAIndicator(close=df['close'], window=200).ema_indicator()
 
     return df
-
-import pandas as pd
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-
 
 def plot_with_offset_targets(df: pd.DataFrame):
     """
@@ -158,4 +136,23 @@ def plot_with_offset_targets(df: pd.DataFrame):
     fig.update_yaxes(title_text="Price (USD)", row=1, col=1)
     fig.update_yaxes(title_text="RSI", row=2, col=1)
 
-    fig.show()
+    # fig.show()
+    return fig
+
+
+# In tools.py
+
+import json
+
+def send_signal_to_n8n(webhook_url, signal_data):
+    """اطلاعات سیگنال را به وبهوک n8n ارسال می‌کند."""
+    try:
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post(webhook_url, data=json.dumps(signal_data), headers=headers, timeout=10)
+
+        if response.status_code == 200:
+            print(f"✅ سیگنال با موفقیت به n8n ارسال شد: {signal_data['signal']}")
+        else:
+            print(f"❌ خطا در ارسال سیگنال به n8n. Status Code: {response.status_code}")
+    except requests.exceptions.RequestException as e:
+        print(f"🔥 خطای شبکه در هنگام اتصال به n8n: {e}")

@@ -1,10 +1,7 @@
 pandas
 streamlit
-time
 ccxt
 advanced-ta
-pandas-ta
 plotly
 yfinance
-ta
 requests # این را برای ارسال SMS اضافه خواهیم کرد
